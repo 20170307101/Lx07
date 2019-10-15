@@ -32,7 +32,7 @@ namespace Service.Controllers
             else
                 return Json(Result.Err("记录数为0"));
         }
-        [HttpGet("{id}"]
+        [HttpGet("{id}")]
         public ActionResult Get(int id)
         {
             var result = DAL.WorkInfo.Instance.GetModel(id);
@@ -85,12 +85,75 @@ namespace Service.Controllers
             }
             catch (Exception ex)
             {
-                if(ex.Message.ToLower().Contains("null"))
+                if (ex.Message.ToLower().Contains("null"))
                     return Json(Result.Err("作者名称，作者图片，上传作品时间，作品审核情况，用户名，是否推荐不能为空"));
                 else
                     return Json(Result.Err(ex.Message));
 
             }
+        }
+        [HttpDelete("{id}")]
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                var n = DAL.WorkInfo.Instance.Delete(id);
+                if (n != 0)
+                    return Json(Result.Ok("删除成功"));
+                else
+                    return Json(Result.Err("workId不存在"));
+            }
+            catch (Exception ex)
+            {
+                return Json(Result.Err(ex.Message));
+            }
+        }
+        [HttpPost("count")]
+        public ActionResult GetCount([FromBody]int[] activityIds)
+        {
+            return Json(DAL.WorkInfo.Instance.GetCount(activityIds));
+        }
+        [HttpPost("page")]
+        public ActionResult getPage([FromBody]Model.WorkPage page)
+        {
+            var result = DAL.WorkInfo.Instance.GetPage(page);
+            if (result.Count() == 0)
+                return Json(Result.Err("返回记录数为0"));
+            else
+                return Json(Result.Ok(result));
+        }
+        [HttpGet("findCount")]
+        public ActionResult getFindCount(string findName)
+        {
+            if (findName == null) findName = "";
+            return Json(DAL.WorkInfo.Instance.GetFindCount(findName));
+        }
+        [HttpGet("myCount")]
+        public ActionResult getMyCount(string userName)
+        {
+            if (userName == null) userName = "";
+            return Json(DAL.WorkInfo.Instance.GetMyCount(userName));
+        }
+        [HttpPost("findPage")]
+        public ActionResult getFindPage([FromBody]Model.WorkFindPage page)
+        {
+            if (page.workName == null) page.workName = "";
+            var result = DAL.WorkInfo.Instance.GetFindPage(page);
+            if (result.Count() == 0)
+                return Json(Result.Err("返回记录数为0"));
+            else
+                return Json(Result.Ok(result));
+        }
+        [HttpPost("myPage")]
+        public ActionResult getMyPage([FromBody]Model.WorkMyPage page)
+        {
+            if (page.userName == null) page.userName = "";
+            var result = DAL.WorkInfo.Instance.GetMyPage(page);
+            if (result.Count() == 0)
+                return Json(Result.Err("返回记录数为0"));
+            else
+                return Json(Result.Ok(result));
+
         }
     }
 }
